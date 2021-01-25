@@ -24,6 +24,8 @@ cmdclass = create_cmdclass(
     data_files_spec=[
         ("share/jupyter/labextensions/jupyter-threejs", str(lab_path), "**"),
         ("share/jupyter/labextensions/jupyter-threejs", str(HERE), "install.json"),
+        # Support JupyterLab 2.x
+        ('share/jupyter/lab/extensions', HERE/'js'/'lab-dist', 'jupyter-threejs-*.tgz'),
     ],
 )
 cmdclass['js'] = combine_commands(
