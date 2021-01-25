@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
-
-from __future__ import print_function
-import os
-import sys
+from pathlib import Path
 
 from jupyter_packaging import (
     create_cmdclass,
@@ -11,45 +8,29 @@ from jupyter_packaging import (
     combine_commands,
     get_version,
 )
-
-from setuptools import setup
+import setuptools
 
 
 LONG_DESCRIPTION = 'A Python/ThreeJS bridge utilizing the Jupyter widget infrastructure.'
 
-here = os.path.dirname(os.path.abspath(__file__))
+HERE = Path(__file__).parent.resolve()
 name = 'pythreejs'
-version = get_version(os.path.join(here, name, '_version.py'))
+lab_path = (HERE / name / "labextension")
 
+version = get_version(HERE / name / '_version.py')
 
 cmdclass = create_cmdclass(
     'js',
     data_files_spec=[
-        ('share/jupyter/nbextensions/jupyter-threejs',
-         name + '/static',
-         '*.js'),
-        ('share/jupyter/nbextensions/jupyter-threejs',
-         name + '/static',
-         '*.js.map'),
-        ('share/jupyter/lab/extensions',
-         'js/lab-dist',
-         'jupyter-threejs-*.tgz'),
-        ('share/jupyter/labextensions/jupyter-threejs/',
-         'share/jupyter/labextensions/jupyter-threejs/',
-         '*.*'),
-        ('share/jupyter/labextensions/jupyter-threejs/static',
-         'share/jupyter/labextensions/jupyter-threejs/static/',
-         '*.*'),
-        ('etc/jupyter/nbconfig',
-         'jupyter-config',
-         '**/*.json'),
+        ("share/jupyter/labextensions/jupyter-threejs", str(lab_path), "**"),
+        ("share/jupyter/labextensions/jupyter-threejs", str(HERE), "install.json"),
     ],
 )
 cmdclass['js'] = combine_commands(
     install_npm(
-        path=os.path.join(here, 'js'),
-        build_dir=os.path.join(here, name, 'static'),
-        source_dir=os.path.join(here, 'js'),
+        path=HERE/'js',
+        build_dir=HERE/'name'/'static',
+        source_dir=HERE/'js',
         build_cmd='build:all'
     ),
     ensure_targets([
@@ -110,4 +91,6 @@ setup_args = {
     ],
 }
 
-setup(**setup_args)
+
+if __name__ == "__main__":
+    setuptools.setup(**setup_args)
