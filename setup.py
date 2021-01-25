@@ -72,7 +72,7 @@ setup_args = {
             'sphinx-rtd-theme',
         ]
     },
-    'packages': [name],  # Manually specify here, update after autogen
+    'packages': setuptools.find_packages(),
     'zip_safe': False,
     'cmdclass': cmdclass,
     'author': 'PyThreejs Development Team',
