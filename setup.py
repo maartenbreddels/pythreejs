@@ -22,10 +22,13 @@ version = get_version(HERE / name / '_version.py')
 cmdclass = create_cmdclass(
     'js',
     data_files_spec=[
+        # Support JupyterLab 3.x prebuilt extension
         ("share/jupyter/labextensions/jupyter-threejs", str(lab_path), "**"),
         ("share/jupyter/labextensions/jupyter-threejs", str(HERE), "install.json"),
         # Support JupyterLab 2.x
-        ('share/jupyter/lab/extensions', HERE/'js'/'lab-dist', 'jupyter-threejs-*.tgz'),
+        ('share/jupyter/lab/extensions', str(HERE/'js'/'lab-dist'), 'jupyter-threejs-*.tgz'),
+        # Support Jupyter Notebook
+        ('etc/jupyter/nbconfig', str(HERE/'jupyter-config'), '**/*.json')
     ],
 )
 cmdclass['js'] = combine_commands(
