@@ -7,8 +7,55 @@ from jupyter_packaging import (
     ensure_targets,
     combine_commands,
     get_version,
+    find_packages,
+    update_package_data
 )
+import jupyter_packaging
 import setuptools
+
+
+# ---------------------------------------------------------------------------
+# Private jupyter_packaging patch
+# ---------------------------------------------------------------------------
+def _update_packages(command):
+    """update build_py options to get packages changes"""
+    command.distribution.packages = find_packages()
+
+    
+def _wrap_command(cmds, cls, strict=True):
+    """Wrap a setup command
+    Parameters
+    ----------
+    cmds: list(str)
+        The names of the other commands to run prior to the command.
+    strict: boolean, optional
+        Wether to raise errors when a pre-command fails.
+    """
+    class WrappedCommand(cls):
+
+        def run(self):
+            if not getattr(self, 'uninstall', None):
+                try:
+                    [self.run_command(cmd) for cmd in cmds]
+                except Exception:
+                    if strict:
+                        raise
+                    else:
+                        pass
+
+            update_packages(self)
+
+            # update package data
+            update_package_data(self.distribution)
+
+            result = cls.run(self)
+            return result
+    return WrappedCommand
+
+
+# Patch the default _wrap_command to support updating packages
+jupyter_packaging._wrap_command = _wrap_command
+# ---------------------------------------------------------------------------
 
 
 LONG_DESCRIPTION = 'A Python/ThreeJS bridge utilizing the Jupyter widget infrastructure.'
